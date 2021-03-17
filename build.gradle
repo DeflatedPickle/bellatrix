@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.plugin.serialization"
+
+    id "com.diffplug.gradle.spotless"
+}
+
+group "$group"
+archivesBaseName = "$name"
+version "$version"
+
+repositories {
+    jcenter()
+    mavenCentral()
+
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlinSerialization}"
+
+    // implementation "io.github.gciatto:kt-math-jvm:${ktMath}"
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = jvmTarget
+        freeCompilerArgs = ["-Xinline-classes"]
+    }
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = jvmTarget
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+
+        licenseHeader "$licenseHeader\n\n"
+    }
+
+    kotlin {
+        ktlint()
+
+        licenseHeader "$licenseHeader\n\n"
+    }
+}
