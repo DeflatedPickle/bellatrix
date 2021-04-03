@@ -1,2 +1,2 @@
 # bellatrix
-A matrix library for Kotlin
+A vector ~~and matrix~~ library for Kotlin

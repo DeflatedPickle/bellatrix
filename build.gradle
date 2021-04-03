@@ -28,7 +28,10 @@ dependencies {
 compileKotlin {
     kotlinOptions {
         jvmTarget = jvmTarget
-        freeCompilerArgs = ["-Xinline-classes"]
+        freeCompilerArgs = [
+                "-Xinline-classes",
+                "-Xopt-in=kotlin.RequiresOptIn"
+        ]
     }
 }
 compileTestKotlin {
