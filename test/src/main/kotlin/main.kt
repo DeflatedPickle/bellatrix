@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST")
+@file:Suppress("UNCHECKED_CAST", "TYPE_INFERENCE_ONLY_INPUT_TYPES_WARNING")
 
 import com.deflatedpickle.bellatrix.Vec2f
 import com.deflatedpickle.bellatrix.Vec2i
@@ -9,6 +9,12 @@ import com.deflatedpickle.bellatrix.sum
 fun main() {
     val v = Vec2i(1, 2)
     println(v)
+    println(v.toList())
+    println(v.toMutableList())
+    println(v.toSet())
+    println(v.toMutableSet())
+    println(v.toTypedArray())
+    println(v.toTypedArray().joinToString())
     val v2 = Vec3i(6, 5, 2)
     println(v2)
     println(v2[0])
@@ -19,6 +25,9 @@ fun main() {
     val vf = Vec2f(1f, 2f)
     val (r1, r2) = vf.plus<Float>(v) as Vec2f
     println("$r1, $r2")
+    println(v.containsAll(v))
+    println(v.containsAll(vf))
+    println(vf.containsAll(v))
 
     val (a1, a2) = v.plus<Int>(vf) as Vec2i
     println("$a1, $a2")

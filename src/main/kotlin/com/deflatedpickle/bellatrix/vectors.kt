@@ -1,9 +1,10 @@
 /* Copyright (c) 2021 DeflatedPickle under the MIT license */
 
-@file:Suppress("unused", "MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate", "UNCHECKED_CAST", "PropertyName")
 
 package com.deflatedpickle.bellatrix
 
+import com.deflatedpickle.bellatrix.util.Operator
 import com.deflatedpickle.bellatrix.util.div
 import com.deflatedpickle.bellatrix.util.minus
 import com.deflatedpickle.bellatrix.util.plus
@@ -111,6 +112,7 @@ class Vector4<T : Number>(
 
     operator fun get(e1: Int, e2: Int): Vector2<T> =
         Vector2(elements[e1], elements[e2])
+
     operator fun get(e1: Int, e2: Int, e3: Int): Vector3<T> =
         Vector3(elements[e1], elements[e2], elements[e3])
 }
@@ -138,8 +140,10 @@ class Vector5<T : Number>(
 
     operator fun get(e1: Int, e2: Int): Vector2<T> =
         Vector2(elements[e1], elements[e2])
+
     operator fun get(e1: Int, e2: Int, e3: Int): Vector3<T> =
         Vector3(elements[e1], elements[e2], elements[e3])
+
     operator fun get(e1: Int, e2: Int, e3: Int, e4: Int): Vector4<T> =
         Vector4(elements[e1], elements[e2], elements[e3], elements[e4])
 }
@@ -169,18 +173,23 @@ class Vector6<T : Number>(
 
     operator fun get(e1: Int, e2: Int): Vector2<T> =
         Vector2(elements[e1], elements[e2])
+
     operator fun get(e1: Int, e2: Int, e3: Int): Vector3<T> =
         Vector3(elements[e1], elements[e2], elements[e3])
+
     operator fun get(e1: Int, e2: Int, e3: Int, e4: Int): Vector4<T> =
         Vector4(elements[e1], elements[e2], elements[e3], elements[e4])
+
     operator fun get(e1: Int, e2: Int, e3: Int, e4: Int, e5: Int): Vector5<T> =
         Vector5(elements[e1], elements[e2], elements[e3], elements[e4], elements[e5])
 }
 
 // TODO: Add a mutable vector
 abstract class Vector<T : Number>(
-    protected vararg val elements: T
+    vararg elements: T
 ) : Collection<T>, Comparable<Vector<*>> {
+    internal val elements = elements.toList()
+
     override fun equals(other: Any?): Boolean {
         if (other !is Vector<*>) return false
         return this.compareTo(other) == 0
@@ -189,182 +198,164 @@ abstract class Vector<T : Number>(
     override fun toString(): String =
         "${this::class.simpleName}<${this.elements[0]::class.simpleName}> { ${this.elements.joinToString()} }"
 
-    override fun hashCode(): Int {
-        return elements.contentHashCode()
-    }
+    override fun hashCode(): Int = this.elements.hashCode()
 
     override val size: Int
-        get() = elements.size
+        get() = this.elements.size
 
     override fun isEmpty(): Boolean = size == 0
-    override fun contains(element: T): Boolean = elements.contains(element)
-    override fun containsAll(elements: Collection<T>): Boolean = elements.containsAll(elements)
-    override fun iterator(): Iterator<T> = elements.iterator()
+    override fun contains(element: T): Boolean = this.elements.contains(element)
+    override fun containsAll(elements: Collection<T>): Boolean = this.elements.containsAll(elements)
+    override fun iterator(): Iterator<T> = this.elements.iterator()
 
-    override fun compareTo(other: Vector<*>): Int = this.elements.contentEquals(other.elements).compareTo(true)
-    operator fun get(element: Int): T = elements[element]
+    override fun compareTo(other: Vector<*>): Int = (this.elements == other.elements).compareTo(true)
+    operator fun get(element: Int): T = this.elements[element]
 
-    inline fun <reified T : Number, reified K : Number> metaPlus(other: Vector<K>): Vector<*> {
+    inline fun <reified T : Number, reified K : Number> metaMath(other: Vector<K>, op: Operator): Vector<*> {
         val size = min(this.`access$elements`.size, other.`access$elements`.size)
 
         val array = Array(size) { this.`access$elements`[it] as T }
-        return listToVector(array.zip(other.`access$elements`.toList().toTypedArray()) { a: T, b: K -> a + b })
+        return listToVector(array.zip(other.`access$elements`) { a: T, b: K ->
+            when (op) {
+                Operator.PLUS -> a + b
+                Operator.MINUS -> a - b
+                Operator.TIMES -> a * b
+                Operator.DIV -> a / b
+                Operator.REM -> a % b
+            }
+        })
     }
 
     @JvmName("plusInt")
-    inline operator fun <reified M : T> plus(other: Vector<Int>): Vector<Int> = metaPlus<M, Int>(other) as Vector<Int>
+    inline operator fun <reified M : T> plus(other: Vector<Int>): Vector<Int> =
+        metaMath<M, Int>(other, Operator.PLUS) as Vector<Int>
 
     @JvmName("plusFloat")
     inline operator fun <reified M : T> plus(other: Vector<Float>): Vector<Float> =
-        metaPlus<M, Float>(other) as Vector<Float>
+        metaMath<M, Float>(other, Operator.PLUS) as Vector<Float>
 
     @JvmName("plusDouble")
     inline operator fun <reified M : T> plus(other: Vector<Double>): Vector<Double> =
-        metaPlus<M, Double>(other) as Vector<Double>
+        metaMath<M, Double>(other, Operator.PLUS) as Vector<Double>
 
     @JvmName("plusLong")
     inline operator fun <reified M : T> plus(other: Vector<Long>): Vector<Long> =
-        metaPlus<M, Long>(other) as Vector<Long>
+        metaMath<M, Long>(other, Operator.PLUS) as Vector<Long>
 
     @JvmName("plusByte")
     inline operator fun <reified M : T> plus(other: Vector<Byte>): Vector<Byte> =
-        metaPlus<M, Byte>(other) as Vector<Byte>
+        metaMath<M, Byte>(other, Operator.PLUS) as Vector<Byte>
 
     @JvmName("plusShort")
     inline operator fun <reified M : T> plus(other: Vector<Short>): Vector<Short> =
-        metaPlus<M, Short>(other) as Vector<Short>
-
-    inline fun <reified T : Number, reified K : Number> metaMinus(other: Vector<K>): Vector<*> {
-        val size = min(this.`access$elements`.size, other.`access$elements`.size)
-
-        val array = Array(size) { this.`access$elements`[it] as T }
-        return listToVector(array.zip(other.`access$elements`.toList().toTypedArray()) { a: T, b: K -> a - b })
-    }
+        metaMath<M, Short>(other, Operator.PLUS) as Vector<Short>
 
     @JvmName("minusInt")
-    inline operator fun <reified M : T> minus(other: Vector<Int>): Vector<Int> = metaMinus<M, Int>(other) as Vector<Int>
+    inline operator fun <reified M : T> minus(other: Vector<Int>): Vector<Int> =
+        metaMath<M, Int>(other, Operator.MINUS) as Vector<Int>
 
     @JvmName("minusFloat")
     inline operator fun <reified M : T> minus(other: Vector<Float>): Vector<Float> =
-        metaMinus<M, Float>(other) as Vector<Float>
+        metaMath<M, Float>(other, Operator.MINUS) as Vector<Float>
 
     @JvmName("minusDouble")
     inline operator fun <reified M : T> minus(other: Vector<Double>): Vector<Double> =
-        metaMinus<M, Double>(other) as Vector<Double>
+        metaMath<M, Double>(other, Operator.MINUS) as Vector<Double>
 
     @JvmName("minusLong")
     inline operator fun <reified M : T> minus(other: Vector<Long>): Vector<Long> =
-        metaMinus<M, Long>(other) as Vector<Long>
+        metaMath<M, Long>(other, Operator.MINUS) as Vector<Long>
 
     @JvmName("minusByte")
     inline operator fun <reified M : T> minus(other: Vector<Byte>): Vector<Byte> =
-        metaMinus<M, Byte>(other) as Vector<Byte>
+        metaMath<M, Byte>(other, Operator.MINUS) as Vector<Byte>
 
     @JvmName("minusShort")
     inline operator fun <reified M : T> minus(other: Vector<Short>): Vector<Short> =
-        metaMinus<M, Short>(other) as Vector<Short>
-
-    inline fun <reified T : Number, reified K : Number> metaTimes(other: Vector<K>): Vector<*> {
-        val size = min(this.`access$elements`.size, other.`access$elements`.size)
-
-        val array = Array(size) { this.`access$elements`[it] as T }
-        return listToVector(array.zip(other.`access$elements`.toList().toTypedArray()) { a: T, b: K -> a * b })
-    }
+        metaMath<M, Short>(other, Operator.MINUS) as Vector<Short>
 
     @JvmName("timesInt")
-    inline operator fun <reified M : T> times(other: Vector<Int>): Vector<Int> = metaTimes<M, Int>(other) as Vector<Int>
+    inline operator fun <reified M : T> times(other: Vector<Int>): Vector<Int> =
+        metaMath<M, Int>(other, Operator.TIMES) as Vector<Int>
 
     @JvmName("timesFloat")
     inline operator fun <reified M : T> times(other: Vector<Float>): Vector<Float> =
-        metaTimes<M, Float>(other) as Vector<Float>
+        metaMath<M, Float>(other, Operator.TIMES) as Vector<Float>
 
     @JvmName("timesDouble")
     inline operator fun <reified M : T> times(other: Vector<Double>): Vector<Double> =
-        metaTimes<M, Double>(other) as Vector<Double>
+        metaMath<M, Double>(other, Operator.TIMES) as Vector<Double>
 
     @JvmName("timesLong")
     inline operator fun <reified M : T> times(other: Vector<Long>): Vector<Long> =
-        metaTimes<M, Long>(other) as Vector<Long>
+        metaMath<M, Long>(other, Operator.TIMES) as Vector<Long>
 
     @JvmName("timesByte")
     inline operator fun <reified M : T> times(other: Vector<Byte>): Vector<Byte> =
-        metaTimes<M, Byte>(other) as Vector<Byte>
+        metaMath<M, Byte>(other, Operator.TIMES) as Vector<Byte>
 
     @JvmName("timesShort")
     inline operator fun <reified M : T> times(other: Vector<Short>): Vector<Short> =
-        metaTimes<M, Short>(other) as Vector<Short>
-
-    inline fun <reified T : Number, reified K : Number> metaDiv(other: Vector<K>): Vector<*> {
-        val size = min(this.`access$elements`.size, other.`access$elements`.size)
-
-        val array = Array(size) { this.`access$elements`[it] as T }
-        return listToVector(array.zip(other.`access$elements`.toList().toTypedArray()) { a: T, b: K -> a / b })
-    }
+        metaMath<M, Short>(other, Operator.TIMES) as Vector<Short>
 
     @JvmName("divInt")
-    inline operator fun <reified M : T> div(other: Vector<Int>): Vector<Int> = metaDiv<M, Int>(other) as Vector<Int>
+    inline operator fun <reified M : T> div(other: Vector<Int>): Vector<Int> =
+        metaMath<M, Int>(other, Operator.DIV) as Vector<Int>
 
     @JvmName("divFloat")
     inline operator fun <reified M : T> div(other: Vector<Float>): Vector<Float> =
-        metaDiv<M, Float>(other) as Vector<Float>
+        metaMath<M, Float>(other, Operator.DIV) as Vector<Float>
 
     @JvmName("divDouble")
     inline operator fun <reified M : T> div(other: Vector<Double>): Vector<Double> =
-        metaDiv<M, Double>(other) as Vector<Double>
+        metaMath<M, Double>(other, Operator.DIV) as Vector<Double>
 
     @JvmName("divLong")
-    inline operator fun <reified M : T> div(other: Vector<Long>): Vector<Long> = metaDiv<M, Long>(other) as Vector<Long>
+    inline operator fun <reified M : T> div(other: Vector<Long>): Vector<Long> =
+        metaMath<M, Long>(other, Operator.DIV) as Vector<Long>
 
     @JvmName("divByte")
-    inline operator fun <reified M : T> div(other: Vector<Byte>): Vector<Byte> = metaDiv<M, Byte>(other) as Vector<Byte>
+    inline operator fun <reified M : T> div(other: Vector<Byte>): Vector<Byte> =
+        metaMath<M, Byte>(other, Operator.DIV) as Vector<Byte>
 
     @JvmName("divShort")
     inline operator fun <reified M : T> div(other: Vector<Short>): Vector<Short> =
-        metaDiv<M, Short>(other) as Vector<Short>
-
-    inline fun <reified T : Number, reified K : Number> metaRem(other: Vector<K>): Vector<*> {
-        val size = min(this.`access$elements`.size, other.`access$elements`.size)
-
-        val array = Array(size) { this.`access$elements`[it] as T }
-        return listToVector(array.zip(other.`access$elements`.toList().toTypedArray()) { a: T, b: K -> a % b })
-    }
+        metaMath<M, Short>(other, Operator.DIV) as Vector<Short>
 
     @JvmName("remInt")
-    inline operator fun <reified M : T> rem(other: Vector<Int>): Vector<Int> = metaRem<M, Int>(other) as Vector<Int>
+    inline operator fun <reified M : T> rem(other: Vector<Int>): Vector<Int> =
+        metaMath<M, Int>(other, Operator.REM) as Vector<Int>
 
     @JvmName("remFloat")
     inline operator fun <reified M : T> rem(other: Vector<Float>): Vector<Float> =
-        metaRem<M, Float>(other) as Vector<Float>
+        metaMath<M, Float>(other, Operator.REM) as Vector<Float>
 
     @JvmName("remDouble")
     inline operator fun <reified M : T> rem(other: Vector<Double>): Vector<Double> =
-        metaRem<M, Double>(other) as Vector<Double>
+        metaMath<M, Double>(other, Operator.REM) as Vector<Double>
 
     @JvmName("remLong")
-    inline operator fun <reified M : T> rem(other: Vector<Long>): Vector<Long> = metaRem<M, Long>(other) as Vector<Long>
+    inline operator fun <reified M : T> rem(other: Vector<Long>): Vector<Long> =
+        metaMath<M, Long>(other, Operator.REM) as Vector<Long>
 
     @JvmName("remByte")
-    inline operator fun <reified M : T> rem(other: Vector<Byte>): Vector<Byte> = metaRem<M, Byte>(other) as Vector<Byte>
+    inline operator fun <reified M : T> rem(other: Vector<Byte>): Vector<Byte> =
+        metaMath<M, Byte>(other, Operator.REM) as Vector<Byte>
 
     @JvmName("remShort")
     inline operator fun <reified M : T> rem(other: Vector<Short>): Vector<Short> =
-        metaRem<M, Short>(other) as Vector<Short>
+        metaMath<M, Short>(other, Operator.REM) as Vector<Short>
 
-    fun toArray(): Array<out T> = elements
-    fun toList(): List<T> = elements.toList()
-    fun toSet(): Set<T> = elements.toSet()
-
-    @Suppress("PropertyName")
     @PublishedApi
-    internal val `access$elements`: Array<out T>
-        get() = elements
+    internal val `access$elements`: List<T>
+        get() = this.elements
 }
 
 /**
  * Sums together the elements of a [Vector]
  */
 // This only works when used as an extension function
-@Suppress("UNCHECKED_CAST")
+@Throws(UnimplementedVectorException::class)
 @ExperimentalStdlibApi
 inline fun <reified T : Number> Vector<T>.sum(): T =
     when (typeOf<T>().classifier) {
@@ -380,6 +371,7 @@ inline fun <reified T : Number> Vector<T>.sum(): T =
 /**
  * Decides the correct vector for the given list of elements
  */
+@Throws(UnimplementedVectorException::class)
 @PublishedApi
 internal fun <T : Number> listToVector(e: List<T>): Vector<T> = when (e.size) {
     0 -> Vector0()

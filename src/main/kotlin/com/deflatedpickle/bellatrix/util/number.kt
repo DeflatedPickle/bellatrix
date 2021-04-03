@@ -2,6 +2,9 @@
 
 package com.deflatedpickle.bellatrix.util
 
+private const val note = "Unknown numeric type"
+
+@Throws(RuntimeException::class)
 operator fun Number.plus(other: Number): Number =
     when (this) {
         is Int -> this.toInt() + other.toInt()
@@ -9,9 +12,10 @@ operator fun Number.plus(other: Number): Number =
         is Long -> this.toLong() + other.toLong()
         is Short -> this.toShort() + other.toShort()
         is Byte -> this.toByte() + other.toByte()
-        else -> throw RuntimeException("Unknown numeric type")
+        else -> throw RuntimeException(note)
     }
 
+@Throws(RuntimeException::class)
 operator fun Number.minus(other: Number): Number =
     when (this) {
         is Int -> this.toInt() - other.toInt()
@@ -19,9 +23,10 @@ operator fun Number.minus(other: Number): Number =
         is Long -> this.toLong() - other.toLong()
         is Short -> this.toShort() - other.toShort()
         is Byte -> this.toByte() - other.toByte()
-        else -> throw RuntimeException("Unknown numeric type")
+        else -> throw RuntimeException(note)
     }
 
+@Throws(RuntimeException::class)
 operator fun Number.times(other: Number): Number =
     when (this) {
         is Int -> this.toInt() * other.toInt()
@@ -29,9 +34,10 @@ operator fun Number.times(other: Number): Number =
         is Long -> this.toLong() * other.toLong()
         is Short -> this.toShort() * other.toShort()
         is Byte -> this.toByte() * other.toByte()
-        else -> throw RuntimeException("Unknown numeric type")
+        else -> throw RuntimeException(note)
     }
 
+@Throws(RuntimeException::class)
 operator fun Number.div(other: Number): Number =
     when (this) {
         is Int -> this.toInt() / other.toInt()
@@ -39,9 +45,10 @@ operator fun Number.div(other: Number): Number =
         is Long -> this.toLong() / other.toLong()
         is Short -> this.toShort() / other.toShort()
         is Byte -> this.toByte() / other.toByte()
-        else -> throw RuntimeException("Unknown numeric type")
+        else -> throw RuntimeException(note)
     }
 
+@Throws(RuntimeException::class)
 operator fun Number.rem(other: Number): Number =
     when (this) {
         is Int -> this.toInt() % other.toInt()
@@ -49,5 +56,5 @@ operator fun Number.rem(other: Number): Number =
         is Long -> this.toLong() % other.toLong()
         is Short -> this.toShort() % other.toShort()
         is Byte -> this.toByte() % other.toByte()
-        else -> throw RuntimeException("Unknown numeric type")
+        else -> throw RuntimeException(note)
     }
