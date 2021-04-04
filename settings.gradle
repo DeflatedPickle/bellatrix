@@ -1,6 +1,6 @@
 pluginManagement {
     plugins {
-        id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
+        id "org.jetbrains.kotlin.multiplatform" version "$kotlinVersion"
         id "org.jetbrains.kotlin.plugin.serialization" version "$kotlinVersion"
 
         id "com.diffplug.gradle.spotless" version "$spotlessVersion"

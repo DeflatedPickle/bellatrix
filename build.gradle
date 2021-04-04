@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "org.jetbrains.kotlin.jvm"
+    id 'org.jetbrains.kotlin.multiplatform'
     id "org.jetbrains.kotlin.plugin.serialization"
 
     id "com.diffplug.gradle.spotless"
@@ -18,24 +18,56 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlinSerialization}"
-
-    // implementation "io.github.gciatto:kt-math-jvm:${ktMath}"
 }
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = jvmTarget
-        freeCompilerArgs = [
-                "-Xinline-classes",
-                "-Xopt-in=kotlin.RequiresOptIn"
-        ]
+kotlin {
+    jvm()
+    js {
+        nodejs()
+        browser()
+    }
+    linuxX64()
+    macosX64()
+    mingwX64()
+    wasm32()
+
+    sourceSets {
+        all {
+            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+        }
+
+        commonMain {
+            dependencies {
+                implementation kotlin('stdlib-common')
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+                // implementation "io.github.gciatto:kt-math-jvm:${ktMath}"
+
+                implementation kotlin('stdlib-jdk8')
+                implementation kotlin('test-junit')
+            }
+        }
+
+        jsMain {
+            dependencies {
+                implementation kotlin('stdlib-js')
+                implementation kotlin('test-js')
+            }
+        }
     }
 }
-compileTestKotlin {
-    kotlinOptions.jvmTarget = jvmTarget
+
+wrapper {
+    gradleVersion = "5.3.1"
+    distributionType = "ALL"
 }
 
 spotless {

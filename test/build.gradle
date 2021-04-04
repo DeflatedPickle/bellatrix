@@ -1,5 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
+
+    id 'application'
 }
 
 repositories {
@@ -9,5 +11,11 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    compile project(':')
+    implementation project(':')
+}
+
+run {
+    application {
+        mainClassName = 'MainKt'
+    }
 }
