@@ -14,32 +14,93 @@ import com.deflatedpickle.bellatrix.util.times
 import com.deflatedpickle.bellatrix.util.to
 import kotlin.jvm.JvmName
 import kotlin.math.abs as ktabs
+import com.deflatedpickle.bellatrix.util.Compare
 import com.deflatedpickle.bellatrix.util.abs
+import com.deflatedpickle.bellatrix.util.compareTo
 import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.reflect.typeOf
 
-fun <T : Number> vectorOf(vararg elements: T): Vector<T> = listToVector(elements.toList())
-fun <T : Number> vecOf(vararg elements: T): Vector<T> = vectorOf(*elements)
+/**
+ * Creates a [Vector] from the variables in [elements]
+ */
+inline fun <reified T : Number> vectorOf(vararg elements: T): Vector<T> = listToVector(elements.toList())
 
+/**
+ * Creates a [Vector] from the variables in [elements]
+ */
+inline fun <reified T : Number> vecOf(vararg elements: T): Vector<T> = vectorOf(*elements)
+
+/**
+ * Creates a [MutableVector] from the variables in [elements]
+ */
 inline fun <reified T : Number> mutableVectorOf(vararg elements: T): MutableVector<T> =
     listToVector(elements.toList()).toMutableVector()
 
+/**
+ * Creates a [MutableVector] from the variables in [elements]
+ */
 inline fun <reified T : Number> mutVecOf(vararg elements: T): MutableVector<T> =
     vectorOf(*elements).toMutableVector()
 
+/**
+ * Creates a [Vector] locked to [Int] from the variables in [elements]
+ */
 fun intVectorOf(vararg elements: Int): Vector<Int> = listToVector(elements.toList())
+
+/**
+ * Creates a [Vector] locked to [Float] from the variables in [elements]
+ */
 fun floatVectorOf(vararg elements: Float): Vector<Float> = listToVector(elements.toList())
+
+/**
+ * Creates a [Vector] locked to [Double] from the variables in [elements]
+ */
 fun doubleVectorOf(vararg elements: Double): Vector<Double> = listToVector(elements.toList())
+
+/**
+ * Creates a [Vector] locked to [Long] from the variables in [elements]
+ */
 fun longVectorOf(vararg elements: Long): Vector<Long> = listToVector(elements.toList())
+
+/**
+ * Creates a [Vector] locked to [Short] from the variables in [elements]
+ */
 fun shortVectorOf(vararg elements: Short): Vector<Short> = listToVector(elements.toList())
+
+/**
+ * Creates a [Vector] locked to [Byte] from the variables in [elements]
+ */
 fun byteVectorOf(vararg elements: Byte): Vector<Byte> = listToVector(elements.toList())
 
+/**
+ * Creates a [Vector] locked to [Int] from the variables in [elements]
+ */
 fun intVecOf(vararg elements: Int): Vector<Int> = intVectorOf(*elements)
+
+/**
+ * Creates a [Vector] locked to [Float] from the variables in [elements]
+ */
 fun floatVecOf(vararg elements: Float): Vector<Float> = floatVectorOf(*elements)
+
+/**
+ * Creates a [Vector] locked to [Double] from the variables in [elements]
+ */
 fun doubleVecOf(vararg elements: Double): Vector<Double> = doubleVectorOf(*elements)
+
+/**
+ * Creates a [Vector] locked to [Long] from the variables in [elements]
+ */
 fun longVecOf(vararg elements: Long): Vector<Long> = longVectorOf(*elements)
+
+/**
+ * Creates a [Vector] locked to [Short] from the variables in [elements]
+ */
 fun shortVecOf(vararg elements: Short): Vector<Short> = shortVectorOf(*elements)
+
+/**
+ * Creates a [Vector] locked to [Byte] from the variables in [elements]
+ */
 fun byteVecOf(vararg elements: Byte): Vector<Byte> = byteVectorOf(*elements)
 
 typealias Vec0<T> = Vector0<T>
@@ -50,6 +111,9 @@ typealias Vec0l = Vector0<Long>
 typealias Vec0s = Vector0<Short>
 typealias Vec0b = Vector0<Byte>
 
+/**
+ * Creates a [Vector] of [T] with zero elements
+ */
 class Vector0<T : Number> : Vector<T>()
 
 typealias Vec1<T> = Vector1<T>
@@ -60,6 +124,9 @@ typealias Vec1l = Vector1<Long>
 typealias Vec1s = Vector1<Short>
 typealias Vec1b = Vector1<Byte>
 
+/**
+ * Creates a [Vector] of [T] with one element
+ */
 class Vector1<T : Number>(
     one: T
 ) : Vector<T>(one) {
@@ -74,6 +141,9 @@ typealias Vec2l = Vector2<Long>
 typealias Vec2s = Vector2<Short>
 typealias Vec2b = Vector2<Byte>
 
+/**
+ * Creates a [Vector] of [T] with two elements
+ */
 class Vector2<T : Number>(
     one: T,
     two: T
@@ -90,6 +160,9 @@ typealias Vec3l = Vector3<Long>
 typealias Vec3s = Vector3<Short>
 typealias Vec3b = Vector3<Byte>
 
+/**
+ * Creates a [Vector] of [T] with three elements
+ */
 class Vector3<T : Number>(
     one: T,
     two: T,
@@ -111,6 +184,9 @@ typealias Vec4l = Vector4<Long>
 typealias Vec4s = Vector4<Short>
 typealias Vec4b = Vector4<Byte>
 
+/**
+ * Creates a [Vector] of [T] with four elements
+ */
 class Vector4<T : Number>(
     one: T,
     two: T,
@@ -137,6 +213,9 @@ typealias Vec5l = Vector5<Long>
 typealias Vec5s = Vector5<Short>
 typealias Vec5b = Vector5<Byte>
 
+/**
+ * Creates a [Vector] of [T] with five elements
+ */
 class Vector5<T : Number>(
     one: T,
     two: T,
@@ -168,6 +247,9 @@ typealias Vec6l = Vector6<Long>
 typealias Vec6s = Vector6<Short>
 typealias Vec6b = Vector6<Byte>
 
+/**
+ * Creates a [Vector] of [T] with six elements
+ */
 class Vector6<T : Number>(
     one: T,
     two: T,
@@ -196,6 +278,9 @@ class Vector6<T : Number>(
         Vector5(elements[e1], elements[e2], elements[e3], elements[e4], elements[e5])
 }
 
+/**
+ * An immutable collection with unlimited elements of [T]
+ */
 open class Vector<T : Number>(
     vararg elements: T
 ) : Collection<T>, Comparable<Vector<*>> {
@@ -231,10 +316,17 @@ open class Vector<T : Number>(
 
     operator fun get(element: Int): T = this.elements[element]
 
+    /**
+     * Calculates the square root of [lengthSquared]
+     */
     fun length(): Double = sqrt(this.lengthSquared().toDouble())
+
+    /**
+     * Calculates the squared sum of this vector
+     */
     fun lengthSquared(): Long = this.elements.sumOf { (it * it).to<Long>() as Long }
 
-    private fun <M : Number> reduceBy(other: Vector<M>): List<Number> {
+    internal fun <M : Number> reduceBy(other: Vector<M>): List<Number> {
         if (this.size != other.size) throw IllegalArgumentException("")
 
         val tempElements = mutableListOf<Number>()
@@ -246,6 +338,9 @@ open class Vector<T : Number>(
         return tempElements
     }
 
+    /**
+     * Calculates the distance between this vector and [other]
+     */
     fun <M : Number> distance(other: Vector<M>): Double {
         val tempElements = this.reduceBy(other)
 
@@ -259,12 +354,21 @@ open class Vector<T : Number>(
         return sqrt(tempFMA.to<Double>() as Double)
     }
 
+    /**
+     * Calculates the grid distance between this vector and [other]
+     */
     fun <M : Number> gridDistance(other: Vector<M>): Long =
         ktabs(this.elements.sumOf { abs(other[this.elements.indexOf(it)] - it).to<Long>() as Long })
 
+    /**
+     * Calculates the squared distance between this vector and [other]
+     */
     fun <M : Number> distanceSquared(other: Vector<M>): Int =
         this.reduceBy(other).sumBy { (it + it).to<Int>() as Int }
 
+    /**
+     * Calculates the dot product between this vector and [other]
+     */
     fun <M : Number> dot(other: Vector<M>): Int =
         this.sumBy { (it * other[this.elements.indexOf(it)]).to<Int>() as Int }
 
@@ -414,6 +518,41 @@ open class Vector<T : Number>(
         get() = this.elements
 }
 
+/**
+ * Returns a vector with the copies of [this]
+ */
+inline fun <reified T : Number> Vector<T>.copy(): Vector<T> = MutableVector(*this.elements.toTypedArray()).toVector()
+
+/**
+ * Copies the values of [this] to [other] and returns [this]
+ */
+inline fun <reified T : Number> Vector<T>.copyTo(other: MutableVector<T>): Vector<T> = this.apply {
+    other.clear()
+    other.addAll(this.elements)
+}
+
+@PublishedApi
+internal inline fun <reified T : Number, reified K : Number> MutableVector<T>.compare(
+    other: Vector<K>,
+    compare: Compare
+): Vector<T> {
+    if (this.size != other.size) throw IllegalArgumentException("")
+
+    for ((i, e) in this.elements.withIndex()) {
+        val o = other[i]
+
+        this[i] = (when (compare) {
+            Compare.MIN -> if (e < o) e else o.to<T>()
+            Compare.MAX -> if (e > o) e else o.to<T>()
+        }) as T
+    }
+
+    return this
+}
+
+/**
+ * An mutable collection with unlimited elements of [T]
+ */
 open class MutableVector<T : Number>(
     vararg elements: T
 ) : Vector<T>(*elements), MutableCollection<T> {
@@ -425,23 +564,51 @@ open class MutableVector<T : Number>(
     override fun removeAll(elements: Collection<T>): Boolean = this.elements.removeAll(elements)
     override fun retainAll(elements: Collection<T>): Boolean = this.elements.retainAll(elements)
 
-    operator fun set(index: Int, element: T): T {
-        val old = this.elements[index]
-        this.elements[index] = element
-        return old
+    operator fun set(index: Int, element: T): T = this.elements[index].apply {
+        this@MutableVector.elements[index] = element
     }
 }
 
-inline fun <reified M : Number> MutableVector<M>.zero(): MutableVector<M> =
-    this.apply { for (i in 0 until this.size) this[i] = (0.to<M>() as M) }
+/**
+ * Sets the values of [this] to the minimum values of either [this] or [other]
+ */
+@Throws(IllegalArgumentException::class)
+inline fun <reified T : Number, reified K : Number> MutableVector<T>.min(other: Vector<K>) =
+    compare(other, Compare.MIN)
 
-inline fun <reified M : Number> MutableVector<M>.negate(): MutableVector<M> =
-    this.apply { for (i in 0 until this.size) this[i] = (this[i] * -1) as M }
+/**
+ * Sets the values of [this] to the maximum values of either [this] or [other]
+ */
+@Throws(IllegalArgumentException::class)
+inline fun <reified T : Number, reified K : Number> MutableVector<T>.max(other: Vector<K>) =
+    compare(other, Compare.MAX)
+
+/**
+ * Sets the values of [this] to it's absolute value
+ */
+inline fun <reified T : Number> MutableVector<T>.absolute(): Vector<T> {
+    for ((i, e) in this.elements.withIndex()) {
+        this[i] = abs(e).to<T>() as T
+    }
+
+    return this
+}
+
+/**
+ * Sets the values of [this] to zero
+ */
+inline fun <reified T : Number> MutableVector<T>.zero(): MutableVector<T> =
+    this.apply { for (i in 0 until this.size) this[i] = (0.to<T>() as T) }
+
+/**
+ * Sets the values of [this] to it's negative value
+ */
+inline fun <reified T : Number> MutableVector<T>.negate(): MutableVector<T> =
+    this.apply { for (i in 0 until this.size) this[i] = (this[i] * -1) as T }
 
 /**
  * Sums together the elements of a [Vector]
  */
-// This only works when used as an extension function
 @Throws(UnimplementedVectorException::class)
 @ExperimentalStdlibApi
 inline fun <reified T : Number> Vector<T>.sum(): T =
@@ -455,36 +622,80 @@ inline fun <reified T : Number> Vector<T>.sum(): T =
         else -> throw UnimplementedVectorException()
     }
 
-/**
- * Decides the correct vector for the given list of elements
- */
 @Throws(UnimplementedVectorException::class)
 @PublishedApi
-internal fun <T : Number> listToVector(e: List<T>): Vector<T> = when (e.size) {
-    0 -> Vector0()
-    1 -> Vector1(e[0])
-    2 -> Vector2(e[0], e[1])
-    3 -> Vector3(e[0], e[1], e[2])
-    4 -> Vector4(e[0], e[1], e[2], e[3])
-    5 -> Vector5(e[0], e[1], e[2], e[3], e[4])
-    6 -> Vector6(e[0], e[1], e[2], e[3], e[4], e[5])
-    else -> throw UnimplementedVectorException()
-}
+internal inline fun <reified T : Number> listToVector(e: List<T>, mutable: Boolean = false): Vector<T> =
+    if (mutable) MutableVector(*e.toTypedArray())
+    else when (e.size) {
+        0 -> Vector0()
+        1 -> Vector1(e[0])
+        2 -> Vector2(e[0], e[1])
+        3 -> Vector3(e[0], e[1], e[2])
+        4 -> Vector4(e[0], e[1], e[2], e[3])
+        5 -> Vector5(e[0], e[1], e[2], e[3], e[4])
+        6 -> Vector6(e[0], e[1], e[2], e[3], e[4], e[5])
+        else -> throw UnimplementedVectorException()
+    }
 
+
+/**
+ * Creates a [MutableVector] from the values of this [Vector], or returns [this] if it's already a [MutableVector]
+ */
 inline fun <reified T : Number> Vector<T>.toMutableVector(): MutableVector<T> =
-    MutableVector(*this.elements.toTypedArray())
+    if (this is MutableVector<T>) this
+    else MutableVector(*this.elements.toTypedArray())
 
-inline fun <reified T : Number> MutableVector<T>.toVector(): Vector<T> = Vector(*this.elements.toTypedArray())
+/**
+ * Creates a [Vector] from the values of this [MutableVector]
+ */
+inline fun <reified T : Number> MutableVector<T>.toVector(): Vector<T> =
+    when (this.size) {
+        0 -> Vector0()
+        1 -> Vector1(this.elements[0])
+        2 -> Vector2(this.elements[0], this.elements[1])
+        3 -> Vector3(this.elements[0], this.elements[1], this.elements[2])
+        4 -> Vector4(this.elements[0], this.elements[1], this.elements[2], this.elements[3])
+        5 -> Vector5(this.elements[0], this.elements[1], this.elements[2], this.elements[3], this.elements[4])
+        6 -> Vector6(
+            this.elements[0],
+            this.elements[1],
+            this.elements[2],
+            this.elements[3],
+            this.elements[4],
+            this.elements[5]
+        )
+        else -> Vector(*this.elements.toTypedArray())
+    }
 
 /**
  * Converts a [List] to a [Vector] of the same amount of values
  */
-fun <T : Number> List<T>.toVector(): Vector<T> = listToVector(this)
-fun <T : Number> Array<T>.toVector(): Vector<T> = listToVector(this.toList())
-fun <T : Number> Set<T>.toVector(): Vector<T> = listToVector(this.toList())
-inline fun <reified T : Number> List<T>.toMutableVector(): Vector<T> = listToVector(this).toMutableVector()
-inline fun <reified T : Number> Array<T>.toMutableVector(): Vector<T> = listToVector(this.toList()).toMutableVector()
-inline fun <reified T : Number> Set<T>.toMutableVector(): Vector<T> = listToVector(this.toList()).toMutableVector()
+inline fun <reified T : Number> List<T>.toVector(): Vector<T> = listToVector(this)
+
+/**
+ * Converts an [Array] to a [Vector] of the same amount of values
+ */
+inline fun <reified T : Number> Array<T>.toVector(): Vector<T> = listToVector(this.toList())
+
+/**
+ * Converts a [Set] to a [Vector] of the same amount of values
+ */
+inline fun <reified T : Number> Set<T>.toVector(): Vector<T> = listToVector(this.toList())
+
+/**
+ * Converts a [List] to a [MutableVector] of the same amount of values
+ */
+inline fun <reified T : Number> List<T>.toMutableVector(): MutableVector<T> = listToVector(this, true) as MutableVector<T>
+
+/**
+ * Converts an [Array] to a [MutableVector] of the same amount of values
+ */
+inline fun <reified T : Number> Array<T>.toMutableVector(): MutableVector<T> = listToVector(this.toList(), true) as MutableVector<T>
+
+/**
+ * Converts a [Set] to a [MutableVector] of the same amount of values
+ */
+inline fun <reified T : Number> Set<T>.toMutableVector(): MutableVector<T> = listToVector(this.toList(), true) as MutableVector<T>
 
 open class VectorException(message: String = "") : Exception(message)
 class UnimplementedVectorException : VectorException(

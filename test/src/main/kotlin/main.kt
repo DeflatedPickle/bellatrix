@@ -4,6 +4,10 @@ import com.deflatedpickle.bellatrix.Vec2f
 import com.deflatedpickle.bellatrix.Vec2i
 import com.deflatedpickle.bellatrix.Vec3i
 import com.deflatedpickle.bellatrix.Vec6i
+import com.deflatedpickle.bellatrix.Vector
+import com.deflatedpickle.bellatrix.absolute
+import com.deflatedpickle.bellatrix.copy
+import com.deflatedpickle.bellatrix.copyTo
 import com.deflatedpickle.bellatrix.mutableVectorOf
 import com.deflatedpickle.bellatrix.sum
 import com.deflatedpickle.bellatrix.toMutableVector
@@ -11,6 +15,10 @@ import com.deflatedpickle.bellatrix.toVector
 import com.deflatedpickle.bellatrix.vectorOf
 import com.deflatedpickle.bellatrix.zero
 import com.deflatedpickle.bellatrix.negate
+import com.deflatedpickle.bellatrix.min
+import com.deflatedpickle.bellatrix.max
+import com.deflatedpickle.bellatrix.mutVecOf
+import com.deflatedpickle.bellatrix.vecOf
 
 @ExperimentalStdlibApi
 fun main() {
@@ -69,24 +77,72 @@ fun main() {
     println(Vec2i(1, 2).distance(Vec2i(2, 2)))
     println(Vec2i(1, 2).distance(Vec2i(2, 3)))
 
+    println(Vec2i(1, 2).distance(Vec2f(1f, 2f)))
+    println(Vec2i(1, 2).distance(Vec2f(2f, 2f)))
+    println(Vec2i(1, 2).distance(Vec2f(2f, 3f)))
+
     println("--- GRID DISTANCE ---")
     println(Vec2i(1, 2).gridDistance(Vec2i(1, 2)))
     println(Vec2i(1, 2).gridDistance(Vec2i(2, 2)))
     println(Vec2i(1, 2).gridDistance(Vec2i(2, 3)))
+
+    println(Vec2i(1, 2).gridDistance(Vec2f(1f, 2f)))
+    println(Vec2i(1, 2).gridDistance(Vec2f(2f, 2f)))
+    println(Vec2i(1, 2).gridDistance(Vec2f(2f, 3f)))
 
     println("--- DISTANCE SQUARED ---")
     println(Vec2i(1, 2).distanceSquared(Vec2i(1, 2)))
     println(Vec2i(1, 2).distanceSquared(Vec2i(2, 2)))
     println(Vec2i(1, 2).distanceSquared(Vec2i(2, 3)))
 
+    println(Vec2i(1, 2).distanceSquared(Vec2f(1f, 2f)))
+    println(Vec2i(1, 2).distanceSquared(Vec2f(2f, 2f)))
+    println(Vec2i(1, 2).distanceSquared(Vec2f(2f, 3f)))
+
     println("--- DOT ---")
     println(Vec2i(1, 2).dot(Vec2i(1, 2)))
     println(Vec2i(1, 2).dot(Vec2i(2, 2)))
     println(Vec2i(1, 2).dot(Vec2i(2, 3)))
+
+    println(Vec2i(1, 2).dot(Vec2f(1f, 2f)))
+    println(Vec2i(1, 2).dot(Vec2f(2f, 2f)))
+    println(Vec2i(1, 2).dot(Vec2f(2f, 3f)))
 
     println("--- ZERO ---")
     println(mutableVectorOf(10, 8).zero())
 
     println("--- NEGATE ---")
     println(mutableVectorOf(10, 8).negate())
+
+    println("--- MIN ---")
+    println(mutVecOf(1, 2).min(Vec2i(1, 2)))
+    println(mutVecOf(1, 2).min(Vec2i(2, 2)))
+    println(mutVecOf(1, 2).min(Vec2i(2, 3)))
+
+    println(mutVecOf(1, 2).min(Vec2f(1f, 2f)))
+    println(mutVecOf(1, 2).min(Vec2f(2f, 2f)))
+    println(mutVecOf(1, 2).min(Vec2f(2f, 3f)))
+
+    println("--- MAX ---")
+    println(mutVecOf(1, 2).max(Vec2i(1, 2)))
+    println(mutVecOf(1, 2).max(Vec2i(2, 2)))
+    println(mutVecOf(1, 2).max(Vec2i(2, 3)))
+
+    println(mutVecOf(1, 2).max(Vec2f(1f, 2f)))
+    println(mutVecOf(1, 2).max(Vec2f(2f, 2f)))
+    println(mutVecOf(1, 2).max(Vec2f(2f, 3f)))
+
+    println("--- ABSOLUTE ---")
+    println(mutableVectorOf(-10, 8).absolute())
+
+    println("--- COPY ---")
+    val original = Vec2i(1, 2)
+    val copy = original.copy()
+    println("$original, $copy")
+
+    println("--- COPY TO ---")
+    val original2 = Vec2i(1, 2)
+    val temp = mutVecOf<Int>()
+    original2.copyTo(temp)
+    println("$original2, $temp")
 }

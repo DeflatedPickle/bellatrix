@@ -67,6 +67,17 @@ operator fun Number.rem(other: Number): Number =
         else -> throw RuntimeException(note)
     }
 
+operator fun <T : Number, K : Number> T.compareTo(other: K): Int =
+    when (this) {
+        is Int -> this.toInt().compareTo(other.toInt())
+        is Float -> this.toFloat().compareTo(other.toFloat())
+        is Double -> this.toDouble().compareTo(other.toDouble())
+        is Long -> this.toLong().compareTo(other.toLong())
+        is Short -> this.toShort().compareTo(other.toShort())
+        is Byte -> this.toByte().compareTo(other.toByte())
+        else -> throw RuntimeException(note)
+    }
+
 @PublishedApi
 @OptIn(ExperimentalStdlibApi::class)
 @Throws(RuntimeException::class)
