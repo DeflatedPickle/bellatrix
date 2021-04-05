@@ -12,6 +12,7 @@ operator fun Number.plus(other: Number): Number =
     when (this) {
         is Int -> this.toInt() + other.toInt()
         is Float -> this.toFloat() + other.toFloat()
+        is Double -> this.toDouble() + other.toDouble()
         is Long -> this.toLong() + other.toLong()
         is Short -> this.toShort() + other.toShort()
         is Byte -> this.toByte() + other.toByte()
@@ -23,6 +24,7 @@ operator fun Number.minus(other: Number): Number =
     when (this) {
         is Int -> this.toInt() - other.toInt()
         is Float -> this.toFloat() - other.toFloat()
+        is Double -> this.toDouble() - other.toDouble()
         is Long -> this.toLong() - other.toLong()
         is Short -> this.toShort() - other.toShort()
         is Byte -> this.toByte() - other.toByte()
@@ -34,6 +36,7 @@ operator fun Number.times(other: Number): Number =
     when (this) {
         is Int -> this.toInt() * other.toInt()
         is Float -> this.toFloat() * other.toFloat()
+        is Double -> this.toDouble() * other.toDouble()
         is Long -> this.toLong() * other.toLong()
         is Short -> this.toShort() * other.toShort()
         is Byte -> this.toByte() * other.toByte()
@@ -45,6 +48,7 @@ operator fun Number.div(other: Number): Number =
     when (this) {
         is Int -> this.toInt() / other.toInt()
         is Float -> this.toFloat() / other.toFloat()
+        is Double -> this.toDouble() / other.toDouble()
         is Long -> this.toLong() / other.toLong()
         is Short -> this.toShort() / other.toShort()
         is Byte -> this.toByte() / other.toByte()
@@ -56,6 +60,7 @@ operator fun Number.rem(other: Number): Number =
     when (this) {
         is Int -> this.toInt() % other.toInt()
         is Float -> this.toFloat() % other.toFloat()
+        is Double -> this.toDouble() % other.toDouble()
         is Long -> this.toLong() % other.toLong()
         is Short -> this.toShort() % other.toShort()
         is Byte -> this.toByte() % other.toByte()
@@ -69,6 +74,7 @@ internal inline fun <reified T : Number> Number.to() =
     when (typeOf<T>().classifier) {
         Int::class -> this.toInt()
         Float::class -> this.toFloat()
+        Double::class -> this.toDouble()
         Long::class -> this.toLong()
         Short::class -> this.toShort()
         Byte::class -> this.toByte()

@@ -9,6 +9,8 @@ import com.deflatedpickle.bellatrix.sum
 import com.deflatedpickle.bellatrix.toMutableVector
 import com.deflatedpickle.bellatrix.toVector
 import com.deflatedpickle.bellatrix.vectorOf
+import com.deflatedpickle.bellatrix.zero
+import com.deflatedpickle.bellatrix.negate
 
 @ExperimentalStdlibApi
 fun main() {
@@ -57,4 +59,34 @@ fun main() {
 
     println(vectorOf(5, 5, 6, 7, 8).plus<Int>(mutableVectorOf(3f).apply { add(7f) }))
     println(vectorOf(3).toMutableVector().apply { add(7) }.plus<Int>(mutableVectorOf(5f, 5f, 6f, 7f, 8f)))
+
+    println("--- LENGTH ---")
+    println(Vec2i(1, 2).length())
+    println(Vec2i(1, 2).lengthSquared())
+
+    println("--- DISTANCE ---")
+    println(Vec2i(1, 2).distance(Vec2i(1, 2)))
+    println(Vec2i(1, 2).distance(Vec2i(2, 2)))
+    println(Vec2i(1, 2).distance(Vec2i(2, 3)))
+
+    println("--- GRID DISTANCE ---")
+    println(Vec2i(1, 2).gridDistance(Vec2i(1, 2)))
+    println(Vec2i(1, 2).gridDistance(Vec2i(2, 2)))
+    println(Vec2i(1, 2).gridDistance(Vec2i(2, 3)))
+
+    println("--- DISTANCE SQUARED ---")
+    println(Vec2i(1, 2).distanceSquared(Vec2i(1, 2)))
+    println(Vec2i(1, 2).distanceSquared(Vec2i(2, 2)))
+    println(Vec2i(1, 2).distanceSquared(Vec2i(2, 3)))
+
+    println("--- DOT ---")
+    println(Vec2i(1, 2).dot(Vec2i(1, 2)))
+    println(Vec2i(1, 2).dot(Vec2i(2, 2)))
+    println(Vec2i(1, 2).dot(Vec2i(2, 3)))
+
+    println("--- ZERO ---")
+    println(mutableVectorOf(10, 8).zero())
+
+    println("--- NEGATE ---")
+    println(mutableVectorOf(10, 8).negate())
 }

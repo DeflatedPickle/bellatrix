@@ -6,12 +6,17 @@ package com.deflatedpickle.bellatrix
 
 import com.deflatedpickle.bellatrix.util.Operator
 import com.deflatedpickle.bellatrix.util.div
+import com.deflatedpickle.bellatrix.util.fma
 import com.deflatedpickle.bellatrix.util.minus
 import com.deflatedpickle.bellatrix.util.plus
 import com.deflatedpickle.bellatrix.util.rem
 import com.deflatedpickle.bellatrix.util.times
 import com.deflatedpickle.bellatrix.util.to
+import kotlin.jvm.JvmName
+import kotlin.math.abs as ktabs
+import com.deflatedpickle.bellatrix.util.abs
 import kotlin.math.max
+import kotlin.math.sqrt
 import kotlin.reflect.typeOf
 
 fun <T : Number> vectorOf(vararg elements: T): Vector<T> = listToVector(elements.toList())
@@ -223,7 +228,45 @@ open class Vector<T : Number>(
     override fun iterator(): Iterator<T> = this.elements.iterator()
 
     override fun compareTo(other: Vector<*>): Int = (this.elements == other.elements).compareTo(true)
+
     operator fun get(element: Int): T = this.elements[element]
+
+    fun length(): Double = sqrt(this.lengthSquared().toDouble())
+    fun lengthSquared(): Long = this.elements.sumOf { (it * it).to<Long>() as Long }
+
+    private fun <M : Number> reduceBy(other: Vector<M>): List<Number> {
+        if (this.size != other.size) throw IllegalArgumentException("")
+
+        val tempElements = mutableListOf<Number>()
+
+        for ((i, e) in this.elements.withIndex()) {
+            tempElements.add(e - other[i])
+        }
+
+        return tempElements
+    }
+
+    fun <M : Number> distance(other: Vector<M>): Double {
+        val tempElements = this.reduceBy(other)
+
+        val last = tempElements.last()
+        var tempFMA = last * last
+
+        for (i in tempElements.reversed().drop(1)) {
+            tempFMA = fma(i, i, tempFMA)
+        }
+
+        return sqrt(tempFMA.to<Double>() as Double)
+    }
+
+    fun <M : Number> gridDistance(other: Vector<M>): Long =
+        ktabs(this.elements.sumOf { abs(other[this.elements.indexOf(it)] - it).to<Long>() as Long })
+
+    fun <M : Number> distanceSquared(other: Vector<M>): Int =
+        this.reduceBy(other).sumBy { (it + it).to<Int>() as Int }
+
+    fun <M : Number> dot(other: Vector<M>): Int =
+        this.sumBy { (it * other[this.elements.indexOf(it)]).to<Int>() as Int }
 
     @PublishedApi
     internal inline fun <reified T : Number, reified K : Number> metaMath(other: Vector<K>, op: Operator): Vector<*> {
@@ -231,9 +274,11 @@ open class Vector<T : Number>(
 
         val array =
             Array(size) {
-                (if (it > this.size - 1) 0.to<T>() else this.`access$elements`[it]) as T
+                (if (it > this.size - 1) 0.to<T>()
+                else this.`access$elements`[it]) as T
             }
-        return listToVector(array.zip(other.`access$elements`.toTypedArray().copyOf(size).map { it ?: 0 }.toList() as List<K>) { a: T, b: K ->
+        return listToVector(array.zip(other.`access$elements`.toTypedArray().copyOf(size).map { it ?: 0 }
+            .toList() as List<K>) { a: T, b: K ->
             when (op) {
                 Operator.PLUS -> a + b
                 Operator.MINUS -> a - b
@@ -379,7 +424,19 @@ open class MutableVector<T : Number>(
     override fun remove(element: T): Boolean = this.elements.remove(element)
     override fun removeAll(elements: Collection<T>): Boolean = this.elements.removeAll(elements)
     override fun retainAll(elements: Collection<T>): Boolean = this.elements.retainAll(elements)
+
+    operator fun set(index: Int, element: T): T {
+        val old = this.elements[index]
+        this.elements[index] = element
+        return old
+    }
 }
+
+inline fun <reified M : Number> MutableVector<M>.zero(): MutableVector<M> =
+    this.apply { for (i in 0 until this.size) this[i] = (0.to<M>() as M) }
+
+inline fun <reified M : Number> MutableVector<M>.negate(): MutableVector<M> =
+    this.apply { for (i in 0 until this.size) this[i] = (this[i] * -1) as M }
 
 /**
  * Sums together the elements of a [Vector]

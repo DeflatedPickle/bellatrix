@@ -71,12 +71,6 @@ wrapper {
 }
 
 spotless {
-    java {
-        googleJavaFormat()
-
-        licenseHeader "$licenseHeader\n\n"
-    }
-
     kotlin {
         ktlint()
 
