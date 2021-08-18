@@ -9,9 +9,9 @@ plugins {
 group "$group"
 archivesBaseName = "$name"
 version "$version"
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
-    jcenter()
     mavenCentral()
 
     maven { url 'https://jitpack.io' }
