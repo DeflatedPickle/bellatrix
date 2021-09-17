@@ -3,7 +3,6 @@
 package com.deflatedpickle.bellatrix
 
 import com.deflatedpickle.bellatrix.util.*
-import kotlin.jvm.JvmName
 import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.reflect.typeOf
@@ -309,38 +308,44 @@ open class MathVector<T : Number>(
         return this
     }
 
-    inline fun <reified K : Number> metaMath(other: K, op: Operator): MathVector<K> {
+    inline fun <reified K : Number> metaImmutableMath(other: K, op: Operator): MathVector<K> {
+        val array = Array(this.`access$elements`.size) {
+            (if (it > this.size - 1) 0.to<K>()
+            else this.`access$elements`[it]) as K
+        }
+
+        val temp = listToMathVector(array.toList())
+
         for ((i, v) in this.withIndex()) {
             when (op) {
-                Operator.PLUS -> this[i] = (v + other) as T
-                Operator.MINUS -> this[i] = (v - other) as T
-                Operator.TIMES -> this[i] = (v * other) as T
-                Operator.DIV -> this[i] = (v / other) as T
-                Operator.REM -> this[i] = (v % other) as T
+                Operator.PLUS -> temp[i] = (v + other) as K
+                Operator.MINUS -> temp[i] = (v - other) as K
+                Operator.TIMES -> temp[i] = (v * other) as K
+                Operator.DIV -> temp[i] = (v / other) as K
+                Operator.REM -> temp[i] = (v % other) as K
             }
         }
 
-        return this as MathVector<K>
+        return temp
     }
 
-    inline operator fun <reified K : Number> plus(other: K): MathVector<K> = metaMath(other, Operator.PLUS)
-    inline operator fun <reified K : Number> minus(other: K): MathVector<K> = metaMath(other, Operator.MINUS)
-    inline operator fun <reified K : Number> times(other: K): MathVector<K> = metaMath(other, Operator.TIMES)
-    inline operator fun <reified K : Number> div(other: K): MathVector<K> = metaMath(other, Operator.DIV)
-    inline operator fun <reified K : Number> rem(other: K): MathVector<K> = metaMath(other, Operator.REM)
+    inline operator fun <reified K : Number> plus(other: K): MathVector<K> = metaImmutableMath(other, Operator.PLUS)
+    inline operator fun <reified K : Number> minus(other: K): MathVector<K> = metaImmutableMath(other, Operator.MINUS)
+    inline operator fun <reified K : Number> times(other: K): MathVector<K> = metaImmutableMath(other, Operator.TIMES)
+    inline operator fun <reified K : Number> div(other: K): MathVector<K> = metaImmutableMath(other, Operator.DIV)
+    inline operator fun <reified K : Number> rem(other: K): MathVector<K> = metaImmutableMath(other, Operator.REM)
 
     @PublishedApi
-    internal inline fun <reified T : Number, reified K : Number> metaVectorMath(
+    internal inline fun <reified T : Number, reified K : Number> metaImmutableVectorMath(
         other: Vector<K>,
         op: Operator
     ): MathVector<K> {
         val size = max(this.`access$elements`.size, other.`access$elements`.size)
 
-        val array =
-            Array(size) {
-                (if (it > this.size - 1) 0.to<T>()
-                else this.`access$elements`[it]) as T
-            }
+        val array = Array(size) {
+            (if (it > this.size - 1) 0.to<T>()
+            else this.`access$elements`[it]) as T
+        }
         return listToMathVector(array.zip(other.`access$elements`.toTypedArray().copyOf(size).map { it ?: 0 }
             .toList() as List<K>) { a: T, b: K ->
             when (op) {
@@ -354,19 +359,57 @@ open class MathVector<T : Number>(
     }
 
     inline operator fun <reified T : Number, reified K : Number> plus(other: Vector<K>): MathVector<K> =
-        metaVectorMath<T, K>(other, Operator.PLUS)
+        metaImmutableVectorMath<T, K>(other, Operator.PLUS)
 
     inline operator fun <reified T : Number, reified K : Number> minus(other: Vector<K>): MathVector<K> =
-        metaVectorMath<T, K>(other, Operator.MINUS)
+        metaImmutableVectorMath<T, K>(other, Operator.MINUS)
 
     inline operator fun <reified T : Number, reified K : Number> times(other: Vector<K>): MathVector<K> =
-        metaVectorMath<T, K>(other, Operator.TIMES)
+        metaImmutableVectorMath<T, K>(other, Operator.TIMES)
 
     inline operator fun <reified T : Number, reified K : Number> div(other: Vector<K>): MathVector<K> =
-        metaVectorMath<T, K>(other, Operator.DIV)
+        metaImmutableVectorMath<T, K>(other, Operator.DIV)
 
     inline operator fun <reified T : Number, reified K : Number> rem(other: Vector<K>): MathVector<K> =
-        metaVectorMath<T, K>(other, Operator.REM)
+        metaImmutableVectorMath<T, K>(other, Operator.REM)
+
+    @PublishedApi
+    internal inline fun <reified K : Number> metaMutableVectorMath(
+        other: Vector<K>,
+        op: Operator
+    ) {
+        val size = max(this.`access$elements`.size, other.`access$elements`.size)
+
+        for (i in 0 until size) {
+            this[i] = when (op) {
+                Operator.PLUS -> (this[i] + other[i]) as T
+                Operator.MINUS -> (this[i] - other[i]) as T
+                Operator.TIMES -> (this[i] * other[i]) as T
+                Operator.DIV -> (this[i] / other[i]) as T
+                Operator.REM -> (this[i] % other[i]) as T
+            }
+        }
+    }
+
+    inline operator fun <reified K : Number> plusAssign(other: Vector<K>) {
+        metaMutableVectorMath(other, Operator.PLUS)
+    }
+
+    inline operator fun <reified K : Number> minusAssign(other: Vector<K>) {
+        metaMutableVectorMath(other, Operator.MINUS)
+    }
+
+    inline operator fun <reified K : Number> timesAssign(other: Vector<K>) {
+        metaMutableVectorMath(other, Operator.TIMES)
+    }
+
+    inline operator fun <reified K : Number> divAssign(other: Vector<K>) {
+        metaMutableVectorMath(other, Operator.DIV)
+    }
+
+    inline operator fun <reified K : Number> remAssign(other: Vector<K>) {
+        metaMutableVectorMath(other, Operator.REM)
+    }
 }
 
 @PublishedApi
@@ -471,4 +514,4 @@ internal inline fun <reified T : Number> listToMathVector(e: List<T>): MathVecto
         else -> MathVector(*e.toTypedArray())
     }
 
-inline operator fun <reified T : Number> Int.times(other: MathVector<T>): MathVector<T> = other.also { it * this }
+inline operator fun <reified T : Number> Number.times(other: MathVector<T>): MathVector<T> = other.also { it * this }

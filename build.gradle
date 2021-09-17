@@ -13,13 +13,6 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
-
-    maven { url 'https://jitpack.io' }
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${kotlinSerializationVersion}"
 }
 
 kotlin {
